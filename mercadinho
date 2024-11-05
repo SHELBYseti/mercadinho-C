@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PRODUTOS 100
+
+typedef struct {
+    char nome[50];
+    float preco;
+    int estoque;
+} Produto;
+
+Produto produtos[MAX_PRODUTOS];
+int num_produtos = 0;
+
+void adicionar_produto() {
+    if (num_produtos >= MAX_PRODUTOS) {
+        printf("Limite de produtos atingido!\n");
+        return;
+    }
+
+    printf("Nome do produto: ");
+    scanf("%s", produtos[num_produtos].nome);
+
+    printf("Preço do produto: ");
+    scanf("%f", &produtos[num_produtos].preco);
+
+    printf("Quantidade em estoque: ");
+    scanf("%d", &produtos[num_produtos].estoque);
+
+    num_produtos++;
+    printf("Produto adicionado com sucesso!\n");
+
+    listar_produtos();
+}
+
+void ajustar_estoque() {
+    int id;
+    printf("Digite o ID do produto para ajustar o estoque: ");
+    scanf("%d", &id);
+
+    if (id < 0 || id >= num_produtos) {
+        printf("Produto inválido!\n");
+        return;
+    }
+
+    printf("Estoque atual de %s: %d\n", produtos[id].nome, produtos[id].estoque);
+    printf("Novo estoque: ");
+    scanf("%d", &produtos[id].estoque);
+
+    printf("Estoque atualizado!\n");
+}
+
+void listar_produtos() {
+    printf("\nProdutos disponíveis:\n");
+    for (int i = 0; i < num_produtos; i++) {
+        printf("%d. %s - Preço: R$%.2f - Estoque: %d\n", i, produtos[i].nome, produtos[i].preco, produtos[i].estoque);
+    }
+}
+
+void comprar_produto() {
+    int id, quantidade;
+    float total = 0.0;
+
+    listar_produtos();
+    printf("Digite o ID do produto que deseja comprar (ou 1234 para finalizar): ");
+    while (1) {
+        scanf("%d", &id);
+        if (id == 1234) break;
+
+        if (id < 0 || id >= num_produtos) {
+            printf("ID do produto inválido. Tente novamente.\n");
+            continue;
+        }
+
+        printf("Quantidade de %s: ", produtos[id].nome);
+        scanf("%d", &quantidade);
+
+        if (quantidade > produtos[id].estoque) {
+            printf("Estoque insuficiente para %s.\n", produtos[id].nome);
+            continue;
+        }
+
+        produtos[id].estoque -= quantidade;
+        total += produtos[id].preco * quantidade;
+        printf("%d unidades de %s adicionadas à compra. Subtotal: R$%.2f\n", quantidade, produtos[id].nome, total);
+        printf("Digite o ID do próximo produto (ou 1234 para finalizar): ");
+    }
+
+    printf("\nTotal da compra: R$%.2f\n", total);
+
+    float pagamento, troco;
+    while (1) {
+        printf("Insira o valor do pagamento: R$");
+        scanf("%f", &pagamento);
+
+        if (pagamento >= total) {
+            troco = pagamento - total;
+            printf("Pagamento realizado com sucesso! Troco: R$%.2f\n", troco);
+            break;
+        } else {
+            printf("Valor insuficiente! O total é R$%.2f. Tente novamente.\n", total);
+        }
+    }
+
+    printf("Obrigado pela compra!\n");
+}
+
+int main() {
+    int opcao;
+
+    while (1) {
+        printf("\n=== Mini Sistema de Mercado ===\n");
+        printf("1. Adicionar Produto\n");
+        printf("2. Comprar Produto\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                adicionar_produto();
+                break;
+            case 2:
+                comprar_produto();
+                break;
+            case 0:
+                printf("Encerrando o sistema.\n");
+                return 0;
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+        }
+    }
+
+    return 0;
+}
